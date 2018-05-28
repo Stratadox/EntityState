@@ -9,7 +9,6 @@ use function get_class as classOf;
 use function gettype as typeOf;
 use function in_array as has;
 use function is_object as isObject;
-use Stratadox\EntityState\Extract;
 
 /**
  * Visited list.
@@ -57,7 +56,7 @@ final class Visited
      */
     public function name($value): string
     {
-        return $this->paths[search($value, $this->visited, true)];
+        return $this->paths[search($value, $this->visited)];
     }
 
     /**

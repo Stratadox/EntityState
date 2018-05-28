@@ -242,6 +242,13 @@ class Extract_the_state_of_the_entities extends TestCase
             Branch::withApplesOf(
                 Ripeness::scored(3),
                 Ripeness::scored(5),
+                Ripeness::scored(1),
+                Ripeness::scored(1)
+            ),
+            Branch::withApplesOf(
+                Ripeness::scored(3),
+                Ripeness::scored(5),
+                Ripeness::scored(1),
                 Ripeness::scored(1)
             ),
             Branch::withApplesOf(
@@ -270,7 +277,12 @@ class Extract_the_state_of_the_entities extends TestCase
         );
         $this->assertProperty(
             $entity,
-            "$apple:$branch:$branches:branches[1][1].$ripeness:ripeness.score",
+            "$apple:$branch:$branches:branches[1][0].$ripeness:ripeness.score",
+            3
+        );
+        $this->assertProperty(
+            $entity,
+            "$apple:$branch:$branches:branches[2][1].$ripeness:ripeness.score",
             8
         );
         $this->assertProperty(
@@ -280,8 +292,18 @@ class Extract_the_state_of_the_entities extends TestCase
         );
         $this->assertProperty(
             $entity,
+            "$apple:$branch:$branches:branches[0][3].$ripeness:ripeness.score",
+            1
+        );
+        $this->assertProperty(
+            $entity,
             "$apple:$branch:$branches:branches[0][2].branch",
             ["$branch:$branches:branches[0]"]
+        );
+        $this->assertProperty(
+            $entity,
+            "$apple:$branch:$branches:branches[1][2].branch",
+            ["$branch:$branches:branches[1]"]
         );
     }
 
