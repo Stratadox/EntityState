@@ -12,16 +12,28 @@ interface RepresentsProperty
     /**
      * Retrieves the property name.
      *
-     * @todo update doc
+     * Properties of value objects contained by the entity are considered part
+     * of the state of the entity.
      *
-     * For properties of properties, ie. associated value object, the property
-     * name is separated by dots.
-     * For example, when the Customer entity gets a new Balance value object,
-     * which still has the same currency but a different value, the change is in
-     * `Balance:balance.value` of the Customer.
+     * When a property is contained in a value object, the property name of the
+     * final value in the value object is used, prepended by the class name and
+     * the property name in the original entity. For example, when a User entity
+     * has a property `userName` that points to Name value object with a string
+     * value in the property `name`, the result would look like this:
+     * `Vendor\Users\Name:userName.name`
+     *
      * Values enclosed in arrays or other collections are represented with
-     * brackets, for instance `messages[1]`.
-     * These notations can be combined into results like: `messages[1].title`.
+     * brackets and prepended with the collection type, for instance
+     * `array:messages[1]`.
+     * When values are contained in value objects which are in turn contained in
+     * a collection of some sort, the value object's class name is prepended to
+     * the the collection type, for example:
+     * `Message:array:messages[0].title`
+     * Or, if the collection is in a Messages class:
+     * `Message:Messages:messages[0].title`
+     *
+     * The above rules can be combined, for instance:
+     * `Message:array:messages[0].Recipient:array:recipients[1].name`
      *
      * @return string The property path.
      */

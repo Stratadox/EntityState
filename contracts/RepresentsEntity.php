@@ -19,19 +19,19 @@ interface RepresentsEntity
     public function class(): string;
 
     /**
+     * Retrieves the identifier of the entity.
+     *
+     * @return string The identifier.
+     */
+    public function id(): string;
+
+    /**
      * Checks whether the entity has the same class and id as the other entity.
      *
      * @param TheOther $entity The entity to compare identifiers with.
      * @return bool            Whether the entities have the same class and id.
      */
     public function hasTheSameIdentityAs(TheOther $entity): bool;
-
-    /**
-     * Retrieves the identifier of the entity.
-     *
-     * @return string The identifier.
-     */
-    public function id(): string;
 
     /**
      * Retrieves the state of the properties.
