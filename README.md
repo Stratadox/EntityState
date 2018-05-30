@@ -61,6 +61,9 @@ assert($changes->removed()[0]->id() === '3');
 assert($changes->altered()[0]->properties()[0]->name() === 'userName');
 assert($changes->altered()[0]->properties()[0]->value() === 'Chuck Norris');
 ```
+
+### Name formatting
+
 Notice that in the above example, the user's name is stored as a string value in
 the property `userName`. If instead the `User` class would have a `Name` value 
 object, the assertion would look more like this:
@@ -71,6 +74,16 @@ If this `Name` object were contained in an array, the result would look like thi
 ```php
 assert($changes->altered()[0]->properties()[0]->name() === 'Name:array:userName[0].name');
 ```
+
+### Value formatting
+
+It may in some cases be preferable to store the string representation of an 
+instance, rather than all its properties.
+To extract a string representation of the objects of a class, one can use:
+```php
+$entityState = Extract::stringifying(UuidInterface::class)->from($identityMap);
+```
+
 
 ## To do
 
