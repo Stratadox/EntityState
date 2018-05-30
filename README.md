@@ -6,8 +6,8 @@
 [![Infection Minimum](https://img.shields.io/badge/msi-95-brightgreen.svg)](https://travis-ci.org/Stratadox/EntityState)
 [![PhpStan Level](https://img.shields.io/badge/phpstan-7/7-brightgreen.svg)](https://travis-ci.org/Stratadox/EntityState)
 [![Maintainability](https://api.codeclimate.com/v1/badges/8c27d62a028e929648d2/maintainability)](https://codeclimate.com/github/Stratadox/EntityState/maintainability)
-[![Latest Stable Version](https://poser.pugx.org/stratadox/identity-map/v/stable)](https://packagist.org/packages/stratadox/identity-map)
-[![License](https://poser.pugx.org/stratadox/identity-map/license)](https://packagist.org/packages/stratadox/identity-map)
+[![Latest Stable Version](https://poser.pugx.org/stratadox/entity-state/v/stable)](https://packagist.org/packages/stratadox/entity-state)
+[![License](https://poser.pugx.org/stratadox/entity-state/license)](https://packagist.org/packages/stratadox/entity-state)
 
 ## Installation
 
