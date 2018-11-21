@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Stratadox\EntityState;
 
-use function count;
 use Stratadox\ImmutableCollection\ImmutableCollection;
 
 /**
