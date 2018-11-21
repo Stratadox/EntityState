@@ -12,6 +12,8 @@ use Stratadox\EntityState\PropertyStates;
 use Stratadox\EntityState\PropertyState;
 use Stratadox\EntityState\TellsWhatChanged;
 use Stratadox\EntityState\Test\Fixture\Beer\Beer;
+use Stratadox\EntityState\Test\Fixture\Beer\Beers;
+use Stratadox\EntityState\Test\Fixture\Beer\Brewery;
 use Stratadox\EntityState\Test\Fixture\FooBar\Baz;
 use Stratadox\EntityState\Test\Fixture\FooBar\Foo;
 
@@ -366,6 +368,8 @@ class EntityStates_are_differentiable_collections extends TestCase
 
     public function differences(): array
     {
+        $beers = Beers::class;
+        $beer = Beer::class;
         return [
             'Foo' => [
                 EntityStates::list(
@@ -407,7 +411,39 @@ class EntityStates_are_differentiable_collections extends TestCase
                         ))
                     )
                 )
-            ]
+            ],
+            'Brewery' => [
+                EntityStates::list(
+                    EntityState::ofThe(Brewery::class, "Brouwerij 't IJ", PropertyStates::list(
+                        PropertyState::with('name', "Brouwerij 't IJ"),
+                        PropertyState::with("$beer:$beers:beers[0].name", 'ZATTE'),
+                        PropertyState::with("$beer:$beers:beers[0].percentage", '8%')
+                    ))
+                ),
+                EntityStates::list(
+                    EntityState::ofThe(Brewery::class, "Brouwerij 't IJ", PropertyStates::list(
+                        PropertyState::with('name', "Brouwerij 't IJ"),
+                        PropertyState::with("$beer:$beers:beers[0].name", 'ZATTE'),
+                        PropertyState::with("$beer:$beers:beers[0].percentage", '8%'),
+                        PropertyState::with("$beer:$beers:beers[1].name", 'NATTE'),
+                        PropertyState::with("$beer:$beers:beers[1].percentage", '6.5%'),
+                        PropertyState::with("$beer:$beers:beers[1].name", 'IJWIT'),
+                        PropertyState::with("$beer:$beers:beers[1].percentage", '6.5%')
+                    ))
+                ),
+                Changes::wereMade(
+                    EntityStates::list(),
+                    EntityStates::list(
+                        EntityState::ofThe(Brewery::class, "Brouwerij 't IJ", PropertyStates::list(
+                            PropertyState::with("$beer:$beers:beers[1].name", 'NATTE'),
+                            PropertyState::with("$beer:$beers:beers[1].percentage", '6.5%'),
+                            PropertyState::with("$beer:$beers:beers[1].name", 'IJWIT'),
+                            PropertyState::with("$beer:$beers:beers[1].percentage", '6.5%')
+                        ))
+                    ),
+                    EntityStates::list()
+                )
+            ],
         ];
     }
 }
