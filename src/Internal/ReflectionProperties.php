@@ -43,9 +43,6 @@ final class ReflectionProperties extends ImmutableCollection
                 ++$level;
                 $reflection = $reflection->getParentClass();
             } while($reflection);
-            foreach ($properties as $property) {
-                $property->setAccessible(true);
-            }
             ReflectionProperties::$cache[$theClass] = new self(...$properties);
         }
         return ReflectionProperties::$cache[$theClass];
