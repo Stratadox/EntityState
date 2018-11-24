@@ -6,7 +6,6 @@ namespace Stratadox\EntityState\Internal;
 use function array_key_exists as alreadyCached;
 use function get_class as theClassOfThe;
 use ReflectionObject;
-use ReflectionProperty;
 use Stratadox\ImmutableCollection\ImmutableCollection;
 
 /**
@@ -34,7 +33,16 @@ final class ReflectionProperties extends ImmutableCollection
     {
         $theClass = theClassOfThe($object);
         if (!alreadyCached($theClass, ReflectionProperties::$cache)) {
-            $properties = (new ReflectionObject($object))->getProperties();
+            $reflection = new ReflectionObject($object);
+            $properties = [];
+            $level = 0;
+            do {
+                foreach ($reflection->getProperties() as $property) {
+                    $properties[] = ReflectionProperty::from($property, $level);
+                }
+                ++$level;
+                $reflection = $reflection->getParentClass();
+            } while($reflection);
             foreach ($properties as $property) {
                 $property->setAccessible(true);
             }

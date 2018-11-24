@@ -97,6 +97,13 @@ final class Extract implements ExtractsEntityState
                 Visited::noneYet()
             );
         }
+        if (empty($properties)) {
+            return EntityState::ofThe(
+                classOfThe($entity),
+                $map->idOf($entity),
+                PropertyStates::list()
+            );
+        }
         return EntityState::ofThe(
             classOfThe($entity),
             $map->idOf($entity),

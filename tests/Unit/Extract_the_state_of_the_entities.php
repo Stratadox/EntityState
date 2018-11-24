@@ -27,6 +27,8 @@ use Stratadox\EntityState\Test\Fixture\FooBar\Bar;
 use Stratadox\EntityState\Test\Fixture\FooBar\Baz;
 use Stratadox\EntityState\Test\Fixture\FooBar\Id;
 use Stratadox\EntityState\Test\Fixture\FooBar\Foo;
+use Stratadox\EntityState\Test\Fixture\Inheritance\Child;
+use Stratadox\EntityState\Test\Fixture\Inheritance\ChildWithPrivateProperty;
 use Stratadox\EntityState\Test\Fixture\ListOfStrings\ListOfStrings;
 use Stratadox\EntityState\Test\Fixture\RentalCar\Aspects;
 use Stratadox\EntityState\Test\Fixture\RentalCar\Branding;
@@ -39,6 +41,7 @@ use Stratadox\IdentityMap\IdentityMap;
  * @covers \Stratadox\EntityState\Extract
  * @covers \Stratadox\EntityState\Internal\Name
  * @covers \Stratadox\EntityState\Internal\ReflectionProperties
+ * @covers \Stratadox\EntityState\Internal\ReflectionProperty
  * @covers \Stratadox\EntityState\Internal\ShouldStringify
  * @covers \Stratadox\EntityState\Internal\Unsatisfiable
  * @covers \Stratadox\EntityState\Internal\Visited
@@ -221,10 +224,10 @@ class Extract_the_state_of_the_entities extends TestCase
     function mapping_objects_without_properties_as_class_name_only()
     {
         $purse = new Purse('xyz', new Coins(
-            new Copper,
-            new Silver,
-            new Silver,
-            new Gold
+            new Copper(),
+            new Silver(),
+            new Silver(),
+            new Gold()
         ));
 
         [$entity] = Extract::state()->from(IdentityMap::with([$purse]));
@@ -236,7 +239,17 @@ class Extract_the_state_of_the_entities extends TestCase
     }
 
     /** @test */
-    function handling_recursion_in_value_objects()
+    function mapping_entities_without_properties_as_class_name_only()
+    {
+        $copper = new Copper();
+
+        [$entity] = Extract::state()->from(IdentityMap::with([$copper]));
+
+        $this->assertEmpty($entity->properties());
+    }
+
+    /** @test */
+    function handling_nested_value_objects()
     {
         $tree = Tree::withBranches(
             Branch::withApplesOf(
@@ -305,6 +318,27 @@ class Extract_the_state_of_the_entities extends TestCase
             "$apple:$branch:$branches:branches[1][2].branch",
             ["$branch:$branches:branches[1]"]
         );
+    }
+
+    /** @test */
+    function mapping_objects_with_parents()
+    {
+        $object = new Child('value');
+
+        [$entity] = Extract::state()->from(IdentityMap::with([$object]));
+
+        $this->assertProperty($entity, 'property{1}', 'value');
+    }
+
+    /** @test */
+    function mapping_objects_with_properties_that_also_exist_in_the_parent()
+    {
+        $object = new ChildWithPrivateProperty('parent value', 'child value');
+
+        [$entity] = Extract::state()->from(IdentityMap::with([$object]));
+
+        $this->assertProperty($entity, 'property', 'child value');
+        $this->assertProperty($entity, 'property{1}', 'parent value');
     }
 
     private function assertProperty(
