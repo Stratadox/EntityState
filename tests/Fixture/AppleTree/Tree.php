@@ -6,7 +6,7 @@ namespace Stratadox\EntityState\Test\Fixture\AppleTree;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
-final class Tree
+class Tree
 {
     private $id;
     private $branches;
@@ -19,7 +19,7 @@ final class Tree
 
     public static function withBranches(Branch ...$branches): self
     {
-        return new self(Uuid::uuid4(), Branches::onTheTree(...$branches));
+        return new static(Uuid::uuid4(), Branches::onTheTree(...$branches));
     }
 
     public function id(): UuidInterface

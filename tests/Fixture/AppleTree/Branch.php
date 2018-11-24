@@ -5,7 +5,7 @@ namespace Stratadox\EntityState\Test\Fixture\AppleTree;
 
 use Stratadox\ImmutableCollection\ImmutableCollection;
 
-final class Branch extends ImmutableCollection
+class Branch extends ImmutableCollection
 {
     public function __construct(Ripeness ...$ripenessOfTheApples)
     {
@@ -18,7 +18,7 @@ final class Branch extends ImmutableCollection
 
     public static function withApplesOf(Ripeness ...$apples): self
     {
-        return new self(...$apples);
+        return new static(...$apples);
     }
 
     public function current(): Apple
@@ -33,7 +33,7 @@ final class Branch extends ImmutableCollection
             $ripeness[] = $apple->ripeness();
         }
         $ripeness[] = Ripeness::scored(0);
-        return new Branch(...$ripeness);
+        return new static(...$ripeness);
     }
 
     public function increaseRipeness(AppleFallObserver $fallObserver): self
@@ -46,6 +46,6 @@ final class Branch extends ImmutableCollection
                 $remainingApples[] = $apple->increaseRipeness();
             }
         }
-        return new Branch(...$remainingApples);
+        return new static(...$remainingApples);
     }
 }

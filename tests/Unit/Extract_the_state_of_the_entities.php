@@ -13,6 +13,8 @@ use Stratadox\EntityState\RepresentsEntity;
 use Stratadox\EntityState\Test\Fixture\AppleTree\Apple;
 use Stratadox\EntityState\Test\Fixture\AppleTree\Branch;
 use Stratadox\EntityState\Test\Fixture\AppleTree\Branches;
+use Stratadox\EntityState\Test\Fixture\AppleTree\ChildBranch;
+use Stratadox\EntityState\Test\Fixture\AppleTree\ChildTree;
 use Stratadox\EntityState\Test\Fixture\AppleTree\Ripeness;
 use Stratadox\EntityState\Test\Fixture\AppleTree\Tree;
 use Stratadox\EntityState\Test\Fixture\Beer\Beer;
@@ -328,6 +330,78 @@ class Extract_the_state_of_the_entities extends TestCase
         [$entity] = Extract::state()->from(IdentityMap::with([$object]));
 
         $this->assertProperty($entity, 'property{1}', 'value');
+    }
+
+    /** @test */
+    function handling_nested_value_objects_with_inheritance()
+    {
+        $tree = ChildTree::withBranches(
+            ChildBranch::withApplesOf(
+                Ripeness::scored(3),
+                Ripeness::scored(5),
+                Ripeness::scored(1),
+                Ripeness::scored(1)
+            ),
+            ChildBranch::withApplesOf(
+                Ripeness::scored(3),
+                Ripeness::scored(5),
+                Ripeness::scored(1),
+                Ripeness::scored(1)
+            ),
+            ChildBranch::withApplesOf(
+                Ripeness::scored(5),
+                Ripeness::scored(8)
+            )
+        );
+
+        $branch = ChildBranch::class;
+        $branches = Branches::class;
+        $apple = Apple::class;
+        $ripeness = Ripeness::class;
+        $uuid = Uuid::class;
+
+        [$entity] = Extract::stringifying(UuidInterface::class)
+            ->from(IdentityMap::with([
+                (string) $tree->id() => $tree
+            ]));
+
+        $this->assertProperty($entity, "$uuid:id{1}", (string) $tree->id());
+
+        $this->assertProperty(
+            $entity,
+            "$apple:$branch:$branches:branches{1}[0][0].$ripeness:ripeness.score",
+            3
+        );
+        $this->assertProperty(
+            $entity,
+            "$apple:$branch:$branches:branches{1}[1][0].$ripeness:ripeness.score",
+            3
+        );
+        $this->assertProperty(
+            $entity,
+            "$apple:$branch:$branches:branches{1}[2][1].$ripeness:ripeness.score",
+            8
+        );
+        $this->assertProperty(
+            $entity,
+            "$apple:$branch:$branches:branches{1}[0][2].$ripeness:ripeness.score",
+            1
+        );
+        $this->assertProperty(
+            $entity,
+            "$apple:$branch:$branches:branches{1}[0][3].$ripeness:ripeness.score",
+            1
+        );
+        $this->assertProperty(
+            $entity,
+            "$apple:$branch:$branches:branches{1}[0][2].branch",
+            ["$branch:$branches:branches{1}[0]"]
+        );
+        $this->assertProperty(
+            $entity,
+            "$apple:$branch:$branches:branches{1}[1][2].branch",
+            ["$branch:$branches:branches{1}[1]"]
+        );
     }
 
     /** @test */
