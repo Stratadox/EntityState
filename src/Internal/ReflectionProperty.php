@@ -2,6 +2,7 @@
 
 namespace Stratadox\EntityState\Internal;
 
+use ReflectionException;
 use ReflectionProperty as BaseReflectionProperty;
 use function sprintf;
 
@@ -29,6 +30,8 @@ final class ReflectionProperty extends BaseReflectionProperty
      * @param BaseReflectionProperty $property The property to convert.
      * @param int                    $level    The inheritance deepness.
      * @return ReflectionProperty              The converted property.
+     * @throws ReflectionException             When the property cannot be
+     *                                         accessed.
      */
     public static function from(
         BaseReflectionProperty $property,

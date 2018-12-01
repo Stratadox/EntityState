@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Stratadox\EntityState\Test\Unit;
 
+use ArrayObject;
 use function implode;
 use const PHP_EOL;
 use PHPUnit\Framework\TestCase;
@@ -32,6 +33,7 @@ use Stratadox\EntityState\Test\Fixture\FooBar\Foo;
 use Stratadox\EntityState\Test\Fixture\Inheritance\Child;
 use Stratadox\EntityState\Test\Fixture\Inheritance\ChildWithPrivateProperty;
 use Stratadox\EntityState\Test\Fixture\ListOfStrings\ListOfStrings;
+use Stratadox\EntityState\Test\Fixture\Map\Map;
 use Stratadox\EntityState\Test\Fixture\RentalCar\Aspects;
 use Stratadox\EntityState\Test\Fixture\RentalCar\Branding;
 use Stratadox\EntityState\Test\Fixture\RentalCar\Make;
@@ -417,6 +419,36 @@ class Extract_the_state_of_the_entities extends TestCase
 
         $this->assertProperty($entity, 'property', 'child value');
         $this->assertProperty($entity, 'property{1}', 'parent value');
+    }
+
+    /** @test */
+    function extracting_the_state_of_an_object_with_a_map()
+    {
+        $object = new Map();
+        $object->map = [
+            '1].foo:bar.baz[0' => 1,
+            '1].foo:bar.\\baz{1}[1' => 1,
+        ];
+
+        [$entity] = Extract::stringifying(UuidInterface::class)
+            ->from(IdentityMap::with([$object]));
+
+        $this->assertProperty($entity, 'array:map[1\\].foo:bar.baz\\[0]', 1);
+        $this->assertProperty($entity, 'array:map[1\\].foo:bar.\\\\baz{1}\\[1]', 1);
+    }
+
+    /** @test */
+    function extracting_the_state_of_an_object_with_map_access()
+    {
+        $object = new ArrayObject();
+        $object['1].foo:bar.baz[0'] = 1;
+        $object['1].foo:bar.\\baz{1}[1'] = 1;
+
+        [$entity] = Extract::stringifying(UuidInterface::class)
+            ->from(IdentityMap::with([$object]));
+
+        $this->assertProperty($entity, 'ArrayObject[1\\].foo:bar.baz\\[0]', 1);
+        $this->assertProperty($entity, 'ArrayObject[1\\].foo:bar.\\\\baz{1}\\[1]', 1);
     }
 
     private function assertProperty(

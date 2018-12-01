@@ -5,6 +5,8 @@ namespace Stratadox\EntityState\Internal;
 
 use function array_key_exists as alreadyCached;
 use function get_class as theClassOfThe;
+use ReflectionClass;
+use ReflectionException;
 use ReflectionObject;
 use Stratadox\ImmutableCollection\ImmutableCollection;
 
@@ -37,9 +39,7 @@ final class ReflectionProperties extends ImmutableCollection
             $properties = [];
             $level = 0;
             do {
-                foreach ($reflection->getProperties() as $property) {
-                    $properties[] = ReflectionProperty::from($property, $level);
-                }
+                $properties = self::addTo($properties, $level, $reflection);
                 ++$level;
                 $reflection = $reflection->getParentClass();
             } while($reflection);
@@ -52,5 +52,20 @@ final class ReflectionProperties extends ImmutableCollection
     public function current(): ReflectionProperty
     {
         return parent::current();
+    }
+
+    private static function addTo(
+        array $properties,
+        int $level,
+        ReflectionClass $reflection
+    ): array {
+        foreach ($reflection->getProperties() as $property) {
+            try {
+                $properties[] = ReflectionProperty::from($property, $level);
+            } catch (ReflectionException $exception) {
+                // skip inaccessible properties
+            }
+        }
+        return $properties;
     }
 }

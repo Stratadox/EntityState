@@ -6,8 +6,8 @@ namespace Stratadox\EntityState\Internal;
 use function get_class;
 use function gettype;
 use function is_object;
-use ReflectionProperty;
 use function sprintf;
+use function str_replace;
 
 /**
  * Potentially prefixed property name.
@@ -17,6 +17,8 @@ use function sprintf;
  */
 final class Name
 {
+    private const PROBLEMS = ['\\', '[', ']'];
+    private const SOLUTIONS = ['\\\\', '\[', '\]'];
     private $prefix;
     private $name;
 
@@ -49,7 +51,7 @@ final class Name
         return new Name('', sprintf(
             '%s[%s]',
             get_class($collection),
-            $key
+            self::escape($key)
         ));
     }
 
@@ -93,7 +95,7 @@ final class Name
                 '%s:%s[%s]',
                 is_object($collection) ? get_class($collection) : gettype($collection),
                 $this->name,
-                $key
+                self::escape($key)
             )
         );
     }
@@ -118,5 +120,10 @@ final class Name
     public function __toString()
     {
         return $this->prefix . $this->name;
+    }
+
+    private static function escape(string $key): string
+    {
+        return str_replace(self::PROBLEMS, self::SOLUTIONS, $key);
     }
 }

@@ -177,19 +177,6 @@ final class Extract implements ExtractsEntityState
         if ($map->hasThe($object)) {
             return [PropertyState::with((string) $name, $map->idOf($object))];
         }
-        return $this->properties($name, $object, $map, $visited);
-    }
-
-    /**
-     * @return RepresentsProperty[]
-     * @throws NoSuchObject
-     */
-    private function properties(
-        Name $name,
-        object $object,
-        Map $map,
-        Visited $visited
-    ): array {
         $properties = [];
         foreach (ReflectionProperties::ofThe($object) as $property) {
             $properties[] = $this->extract(
