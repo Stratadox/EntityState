@@ -168,7 +168,7 @@ class Extract_the_state_of_the_entities extends TestCase
 
         $this->assertSame('Bar', $entity->id());
 
-        $this->assertProperty($entity, "count(array:foos)", 2);
+        $this->assertProperty($entity, 'count(array:foos)', 2);
 
         $this->assertProperty($entity, "$foo:array:foos[0].id", 1000);
         $this->assertProperty($entity, "$foo:array:foos[0].name", 'Foo 0');
@@ -313,7 +313,11 @@ class Extract_the_state_of_the_entities extends TestCase
         $this->assertProperty(
             $entity,
             "$apple:$branch:$branches:branches[0][2].branch",
-            ["$branch:$branches:branches[0]"]
+            ["$branch:$branches:branches[0]"],
+            'The branch object that is pointed to is already represented. ' .
+            "If we'd follow the pointers, we'd end up in an infinite loop; " .
+            'Instead, the already processed object is pointed to by storing ' .
+            "the offset for the object in the entity's state representation."
         );
         $this->assertProperty(
             $entity,
@@ -418,28 +422,33 @@ class Extract_the_state_of_the_entities extends TestCase
     private function assertProperty(
         RepresentsEntity $entity,
         string $expectedName,
-        $expectedValue
+        $expectedValue,
+        string $extraMessage = ''
     ): void {
         $names = [];
         foreach ($entity->properties() as $property) {
             if ($property->name() === $expectedName) {
                 $this->assertSame($expectedValue, $property->value(), sprintf(
-                    'Failed to assert the value of %s `%s` property `%s`',
+                    'Failed to assert the value of %s `%s` property `%s`. %s',
                     $entity->class(),
                     $entity->id(),
-                    $expectedName
+                    $expectedName,
+                    $extraMessage
                 ));
                 return;
             }
             $names[] = $property->name();
         }
         $this->fail(sprintf(
-            'Failed to assert that the %s `%s` has a registered property `%s`. Found: %s%s',
+            'Failed to assert that the %s `%s` has a registered property `%s`. ' .
+            'Found: %s%s%s%s',
             $entity->class(),
             $entity->id(),
             $expectedName,
             PHP_EOL,
-            implode(PHP_EOL, $names)
+            implode(PHP_EOL, $names),
+            PHP_EOL,
+            $extraMessage
         ));
     }
 }

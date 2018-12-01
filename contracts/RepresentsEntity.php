@@ -36,6 +36,10 @@ interface RepresentsEntity
     /**
      * Retrieves the state of the properties.
      *
+     * Includes all the (nested) properties of its value objects.
+     * Value objects' content is included as flattened list in order to make
+     * differentiating the states of the entities easier.
+     *
      * @return ListsPropertyStates A list of the properties of the entity.
      */
     public function properties(): ListsPropertyStates;
