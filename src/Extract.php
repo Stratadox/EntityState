@@ -54,19 +54,19 @@ final class Extract implements ExtractsEntityState
     }
 
     /** @inheritdoc */
-    public function from(Map $map): ListsEntityStates
+    public function from(Map $map): State
     {
         return $this->fromOnly($map, ...$map->objects());
     }
 
     /** @inheritdoc */
-    public function fromOnly(Map $map, object ...$objects): ListsEntityStates
+    public function fromOnly(Map $map, object ...$objects): State
     {
-        return EntityStates::list(...extractWith(
+        return StateRepresentation::with(EntityStates::list(...extractWith(
             function (object $entity) use ($map): RepresentsEntity {
                 return $this->stateOfThe($entity, $map);
             }, $objects
-        ));
+        )), $map);
     }
 
     /** @throws NoSuchObject */

@@ -451,6 +451,16 @@ class Extract_the_state_of_the_entities extends TestCase
         $this->assertProperty($entity, 'ArrayObject[1\\].foo:bar.\\\\baz{1}\\[1]', 1);
     }
 
+    /** @test */
+    function retaining_the_identity_map_in_the_result()
+    {
+        $map = IdentityMap::with([new Copper()]);
+
+        $state = Extract::state()->from($map);
+
+        $this->assertSame($map, $state->identityMap());
+    }
+
     private function assertProperty(
         RepresentsEntity $entity,
         string $expectedName,
