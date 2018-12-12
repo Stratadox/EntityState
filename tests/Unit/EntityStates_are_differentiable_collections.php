@@ -412,10 +412,11 @@ class EntityStates_are_differentiable_collections extends TestCase
                     )
                 )
             ],
-            'Brewery' => [
+            'Brewery 1' => [
                 EntityStates::list(
                     EntityState::ofThe(Brewery::class, "Brouwerij 't IJ", PropertyStates::list(
                         PropertyState::with('name', "Brouwerij 't IJ"),
+                        PropertyState::with("count($beers:beers)", 1),
                         PropertyState::with("$beer:$beers:beers[0].name", 'ZATTE'),
                         PropertyState::with("$beer:$beers:beers[0].percentage", '8%')
                     ))
@@ -423,22 +424,55 @@ class EntityStates_are_differentiable_collections extends TestCase
                 EntityStates::list(
                     EntityState::ofThe(Brewery::class, "Brouwerij 't IJ", PropertyStates::list(
                         PropertyState::with('name', "Brouwerij 't IJ"),
+                        PropertyState::with("count($beers:beers)", 3),
                         PropertyState::with("$beer:$beers:beers[0].name", 'ZATTE'),
                         PropertyState::with("$beer:$beers:beers[0].percentage", '8%'),
                         PropertyState::with("$beer:$beers:beers[1].name", 'NATTE'),
                         PropertyState::with("$beer:$beers:beers[1].percentage", '6.5%'),
-                        PropertyState::with("$beer:$beers:beers[1].name", 'IJWIT'),
-                        PropertyState::with("$beer:$beers:beers[1].percentage", '6.5%')
+                        PropertyState::with("$beer:$beers:beers[2].name", 'IJWIT'),
+                        PropertyState::with("$beer:$beers:beers[2].percentage", '6.5%')
                     ))
                 ),
                 Changes::wereMade(
                     EntityStates::list(),
                     EntityStates::list(
                         EntityState::ofThe(Brewery::class, "Brouwerij 't IJ", PropertyStates::list(
+                            PropertyState::with("count($beers:beers)", 3),
                             PropertyState::with("$beer:$beers:beers[1].name", 'NATTE'),
                             PropertyState::with("$beer:$beers:beers[1].percentage", '6.5%'),
-                            PropertyState::with("$beer:$beers:beers[1].name", 'IJWIT'),
-                            PropertyState::with("$beer:$beers:beers[1].percentage", '6.5%')
+                            PropertyState::with("$beer:$beers:beers[2].name", 'IJWIT'),
+                            PropertyState::with("$beer:$beers:beers[2].percentage", '6.5%')
+                        ))
+                    ),
+                    EntityStates::list()
+                )
+            ],
+            'Brewery 2' => [
+                EntityStates::list(
+                    EntityState::ofThe(Brewery::class, "Brouwerij 't IJ", PropertyStates::list(
+                        PropertyState::with('name', "Brouwerij 't IJ"),
+                        PropertyState::with("count($beers:beers)", 3),
+                        PropertyState::with("$beer:$beers:beers[0].name", 'ZATTE'),
+                        PropertyState::with("$beer:$beers:beers[0].percentage", '8%'),
+                        PropertyState::with("$beer:$beers:beers[1].name", 'NATTE'),
+                        PropertyState::with("$beer:$beers:beers[1].percentage", '6.5%'),
+                        PropertyState::with("$beer:$beers:beers[2].name", 'IJWIT'),
+                        PropertyState::with("$beer:$beers:beers[2].percentage", '6.5%')
+                    ))
+                ),
+                EntityStates::list(
+                    EntityState::ofThe(Brewery::class, "Brouwerij 't IJ", PropertyStates::list(
+                        PropertyState::with('name', "Brouwerij 't IJ"),
+                        PropertyState::with("count($beers:beers)", 1),
+                        PropertyState::with("$beer:$beers:beers[0].name", 'ZATTE'),
+                        PropertyState::with("$beer:$beers:beers[0].percentage", '8%')
+                    ))
+                ),
+                Changes::wereMade(
+                    EntityStates::list(),
+                    EntityStates::list(
+                        EntityState::ofThe(Brewery::class, "Brouwerij 't IJ", PropertyStates::list(
+                            PropertyState::with("count($beers:beers)", 1)
                         ))
                     ),
                     EntityStates::list()
