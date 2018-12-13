@@ -49,6 +49,10 @@ use Stratadox\IdentityMap\IdentityMap;
  * @covers \Stratadox\EntityState\Internal\ShouldStringify
  * @covers \Stratadox\EntityState\Internal\Unsatisfiable
  * @covers \Stratadox\EntityState\Internal\Visited
+ * @covers \Stratadox\EntityState\Internal\CollectionExtractor
+ * @covers \Stratadox\EntityState\Internal\ObjectExtractor
+ * @covers \Stratadox\EntityState\Internal\PropertyExtractor
+ * @covers \Stratadox\EntityState\Internal\ScalarExtractor
  */
 class Extract_the_state_of_the_entities extends TestCase
 {

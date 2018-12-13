@@ -18,7 +18,7 @@ use function str_replace;
 final class Name
 {
     private const PROBLEMS = ['\\', '[', ']'];
-    private const SOLUTIONS = ['\\\\', '\[', '\]'];
+    private const SOLUTIONS = ['\\\\', '\\[', '\\]'];
     private $prefix;
     private $name;
 
@@ -100,6 +100,12 @@ final class Name
         );
     }
 
+    /**
+     * Returns a name for the semi-magic property to count the collection.
+     *
+     * @param iterable $collection The collection to store the count of.
+     * @return Name                The collection counting name.
+     */
     public function toCount(iterable $collection): Name
     {
         return new Name(
