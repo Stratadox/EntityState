@@ -53,6 +53,7 @@ use Stratadox\IdentityMap\IdentityMap;
  * @covers \Stratadox\EntityState\Internal\ObjectExtractor
  * @covers \Stratadox\EntityState\Internal\PropertyExtractor
  * @covers \Stratadox\EntityState\Internal\ScalarExtractor
+ * @covers \Stratadox\EntityState\Internal\ExtractionRequest
  */
 class Extract_the_state_of_the_entities extends TestCase
 {

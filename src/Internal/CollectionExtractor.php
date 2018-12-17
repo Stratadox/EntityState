@@ -6,7 +6,6 @@ use function array_merge as these;
 use function assert;
 use function is_iterable;
 use Stratadox\EntityState\PropertyState;
-use Stratadox\IdentityMap\MapsObjectsByIdentity as Map;
 
 final class CollectionExtractor implements Extractor
 {
@@ -23,30 +22,25 @@ final class CollectionExtractor implements Extractor
     }
 
     public function extract(
-        Name $name,
-        $collection,
-        Map $map,
-        Visited $visited,
+        ExtractionRequest $request,
         Extractor $base = null
     ): array {
-        if (!is_iterable($collection)) {
-            return $this->next->extract($name, $collection, $map, $visited, $base);
+        if (!is_iterable($request->value())) {
+            return $this->next->extract($request, $base);
         }
         assert($base !== null);
         $properties = [];
         $count = 0;
-        foreach ($collection as $key => $value) {
-            $properties[] = $base->extract(
-                $name->forItem($collection, (string) $key),
-                $value,
-                $map,
-                $visited,
-                $base
-            );
+        foreach ($request->value() as $key => $value) {
+            $properties[] = $base->extract($request->forCollectionItem(
+                $request->value(),
+                (string) $key,
+                $value
+            ));
             $count++;
         }
         return these(
-            [PropertyState::with((string) $name->toCount($collection), $count)],
+            [PropertyState::with((string) $request->nameForCounting(), $count)],
             ...$properties
         );
     }

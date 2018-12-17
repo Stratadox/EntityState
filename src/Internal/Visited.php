@@ -43,7 +43,7 @@ final class Visited
      * @param mixed $value The value to check for.
      * @return bool        Whether the value is on the list.
      */
-    public function alreadyThe($value): bool
+    public function already($value): bool
     {
         return has($value, $this->visited, true);
     }
@@ -68,7 +68,7 @@ final class Visited
      * @param Name  $name  The name of the visited property.
      * @return Visited     The updated visited list.
      */
-    public function the($value, Name $name): Visited
+    public function add($value, Name $name): Visited
     {
         return new Visited(
             add($this->visited, [$value]),

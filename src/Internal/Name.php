@@ -28,56 +28,9 @@ final class Name
         $this->name = $name;
     }
 
-    /**
-     * Produces a name based on a reflection property.
-     *
-     * @param ReflectionProperty $property The reflection property.
-     * @return Name                        The name for the property.
-     */
-    public static function fromReflection(ReflectionProperty $property): Name
+    public static function start(): self
     {
-        return new Name('', $property->getName());
-    }
-
-    /**
-     * Produces a name based on a collection entry.
-     *
-     * @param object $collection The collection object.
-     * @param string $key        The position in the collection.
-     * @return Name              The name for the collection entry.
-     */
-    public static function fromCollectionEntry(object $collection, string $key): Name
-    {
-        return new Name('', sprintf(
-            '%s[%s]',
-            get_class($collection),
-            self::escape($key)
-        ));
-    }
-
-    /**
-     * Adds the class of the object to the property name definition.
-     *
-     * @param object $object The object whose class to add.
-     * @return Name          The name with added class.
-     */
-    public function for(object $object): Name
-    {
-        return new Name(
-            $this->prefix,
-            sprintf('%s:%s', get_class($object), $this->name)
-        );
-    }
-
-    /**
-     * Returns a name for the nested property.
-     *
-     * @param ReflectionProperty $property The nested property.
-     * @return Name                        The prefixed property name.
-     */
-    public function forNested(ReflectionProperty $property): Name
-    {
-        return new Name(sprintf('%s.', $this), $property->getName());
+        return new self('', '');
     }
 
     /**
@@ -92,12 +45,37 @@ final class Name
         return new Name(
             $this->prefix,
             sprintf(
-                '%s:%s[%s]',
+                '%s%s[%s]',
                 is_object($collection) ? get_class($collection) : gettype($collection),
-                $this->name,
-                self::escape($key)
+                $this->nameWithColon(),
+                $this->escape($key)
             )
         );
+    }
+
+    /**
+     * Adds the class of the object to the property name definition.
+     *
+     * @param object $object The object whose class to add.
+     * @return Name          The name with added class.
+     */
+    public function for(object $object): Name
+    {
+        return new Name(
+            $this->prefix,
+            sprintf('%s%s', get_class($object), $this->nameWithColon())
+        );
+    }
+
+    /**
+     * Returns a name for the nested property.
+     *
+     * @param ReflectionProperty $property The nested property.
+     * @return Name                        The prefixed property name.
+     */
+    public function forReflected(ReflectionProperty $property): Name
+    {
+        return new Name($this->asPrefix(), $property->getName());
     }
 
     /**
@@ -111,9 +89,9 @@ final class Name
         return new Name(
             $this->prefix,
             sprintf(
-                'count(%s:%s)',
+                'count(%s%s)',
                 is_object($collection) ? get_class($collection) : gettype($collection),
-                $this->name
+                $this->nameWithColon()
             )
         );
     }
@@ -128,8 +106,21 @@ final class Name
         return $this->prefix . $this->name;
     }
 
-    private static function escape(string $key): string
+    private function escape(string $key): string
     {
         return str_replace(self::PROBLEMS, self::SOLUTIONS, $key);
+    }
+
+    private function asPrefix(): string
+    {
+        if ($this->prefix === '' && $this->name === '') {
+            return '';
+        }
+        return sprintf('%s.', $this);
+    }
+
+    private function nameWithColon(): string
+    {
+        return $this->name ? sprintf(':%s', $this->name) : '';
     }
 }

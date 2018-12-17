@@ -4,19 +4,14 @@ declare(strict_types=1);
 namespace Stratadox\EntityState;
 
 use function array_map as extractWith;
-use function array_merge as these;
 use function get_class as classOfThe;
-use function is_iterable as itIsACollection;
-use function sprintf;
 use Stratadox\EntityState\Internal\CollectionExtractor;
+use Stratadox\EntityState\Internal\ExtractionRequest;
 use Stratadox\EntityState\Internal\Extractor;
-use Stratadox\EntityState\Internal\Name;
 use Stratadox\EntityState\Internal\ObjectExtractor;
 use Stratadox\EntityState\Internal\PropertyExtractor;
-use Stratadox\EntityState\Internal\ReflectionProperties;
 use Stratadox\EntityState\Internal\ScalarExtractor;
 use Stratadox\EntityState\Internal\ShouldStringify;
-use Stratadox\EntityState\Internal\Visited;
 use Stratadox\IdentityMap\MapsObjectsByIdentity as Map;
 use Stratadox\IdentityMap\NoSuchObject;
 
@@ -88,37 +83,12 @@ final class Extract implements ExtractsEntityState
     /** @throws NoSuchObject */
     private function stateOfThe(object $entity, Map $map): RepresentsEntity
     {
-        $properties = [];
-        if (itIsACollection($entity)) {
-            $count = 0;
-            foreach ($entity as $key => $item) {
-                $properties[] = $this->extractor->extract(
-                    Name::fromCollectionEntry($entity, (string) $key),
-                    $item,
-                    $map,
-                    Visited::noneYet()
-                );
-                $count++;
-            }
-            $properties[] = [PropertyState::with(sprintf(
-                'count(%s)',
-                classOfThe($entity)
-            ), $count)];
-        }
-        foreach (ReflectionProperties::ofThe($entity) as $property) {
-            $properties[] = $this->extractor->extract(
-                Name::fromReflection($property),
-                $property->getValue($entity),
-                $map,
-                Visited::noneYet()
-            );
-        }
         return EntityState::ofThe(
             classOfThe($entity),
             $map->idOf($entity),
-            empty($properties) ? PropertyStates::list() : PropertyStates::list(
-                ...these(...$properties)
-            )
+            PropertyStates::list(...$this->extractor->extract(
+                ExtractionRequest::for($entity, $map)
+            ))
         );
     }
 }

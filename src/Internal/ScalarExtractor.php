@@ -3,7 +3,6 @@
 namespace Stratadox\EntityState\Internal;
 
 use Stratadox\EntityState\PropertyState;
-use Stratadox\IdentityMap\MapsObjectsByIdentity as Map;
 
 final class ScalarExtractor implements Extractor
 {
@@ -17,12 +16,12 @@ final class ScalarExtractor implements Extractor
     }
 
     public function extract(
-        Name $name,
-        $value,
-        Map $map,
-        Visited $visited,
+        ExtractionRequest $request,
         Extractor $baseExtractor = null
     ): array {
-        return [PropertyState::with((string) $name, $value)];
+        return [PropertyState::with(
+            (string) $request->name(),
+            $request->value()
+        )];
     }
 }

@@ -3,7 +3,6 @@
 namespace Stratadox\EntityState\Internal;
 
 use Stratadox\EntityState\PropertyState;
-use Stratadox\IdentityMap\MapsObjectsByIdentity as Map;
 
 final class PropertyExtractor implements Extractor
 {
@@ -20,21 +19,15 @@ final class PropertyExtractor implements Extractor
     }
 
     public function extract(
-        Name $name,
-        $value,
-        Map $map,
-        Visited $visited,
+        ExtractionRequest $request,
         Extractor $baseExtractor = null
     ): array {
-        if ($visited->alreadyThe($value)) {
-            return [PropertyState::with((string) $name, [$visited->name($value)])];
+        if ($request->isRecursive()) {
+            return [PropertyState::with(
+                (string) $request->name(),
+                [$request->visitedName()]
+            )];
         }
-        return $this->next->extract(
-            $name,
-            $value,
-            $map,
-            $visited->the($value, $name),
-            $this
-        );
+        return $this->next->extract($request->withVisitation(), $this);
     }
 }

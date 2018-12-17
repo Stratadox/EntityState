@@ -3,7 +3,6 @@
 namespace Stratadox\EntityState\Internal;
 
 use Stratadox\EntityState\RepresentsProperty;
-use Stratadox\IdentityMap\MapsObjectsByIdentity as Map;
 use Stratadox\IdentityMap\NoSuchObject;
 
 interface Extractor
@@ -13,10 +12,7 @@ interface Extractor
      * @throws NoSuchObject
      */
     public function extract(
-        Name $name,
-        $value,
-        Map $map,
-        Visited $visited,
+        ExtractionRequest $request,
         Extractor $baseExtractor = null
     ): array;
 }
