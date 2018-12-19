@@ -6,29 +6,19 @@ use function array_merge as these;
 use function assert;
 use function is_object;
 use Stratadox\EntityState\PropertyState;
-use Stratadox\Specification\Contract\Satisfiable;
 
 final class ObjectExtractor implements Extractor
 {
     private $next;
-    private $stringifier;
 
-    private function __construct(Extractor $next, Satisfiable $constraint)
+    private function __construct(Extractor $next)
     {
         $this->next = $next;
-        $this->stringifier = $constraint;
     }
 
     public static function withAlternative(Extractor $next): Extractor
     {
-        return new self($next, Unsatisfiable::constraint());
-    }
-
-    public static function stringifyingWithAlternative(
-        Satisfiable $constraint,
-        Extractor $next
-    ): Extractor {
-        return new self($next, $constraint);
+        return new self($next);
     }
 
     public function extract(
@@ -37,18 +27,6 @@ final class ObjectExtractor implements Extractor
     ): array {
         if (!is_object($request->value())) {
             return $this->next->extract($request, $base);
-        }
-        if ($this->stringifier->isSatisfiedBy($request->value())) {
-            return [PropertyState::with(
-                (string) $request->objectName(),
-                (string) $request->value()
-            )];
-        }
-        if ($request->pointsToAnotherEntity()) {
-            return [PropertyState::with(
-                (string) $request->objectName(),
-                $request->otherEntityId()
-            )];
         }
         assert($base !== null);
         $properties = [];

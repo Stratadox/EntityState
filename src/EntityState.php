@@ -108,10 +108,6 @@ final class EntityState implements RepresentsEntity
 
     private function with(ListsPropertyStates $properties): RepresentsEntity
     {
-        return EntityState::ofThe(
-            $this->class,
-            $this->id,
-            PropertyStates::list(...$properties)
-        );
+        return EntityState::ofThe($this->class, $this->id, $properties);
     }
 }

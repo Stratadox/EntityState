@@ -6,12 +6,14 @@ namespace Stratadox\EntityState;
 use function array_map as extractWith;
 use function get_class as classOfThe;
 use Stratadox\EntityState\Internal\CollectionExtractor;
+use Stratadox\EntityState\Internal\EntityReferenceExtractor;
 use Stratadox\EntityState\Internal\ExtractionRequest;
 use Stratadox\EntityState\Internal\Extractor;
 use Stratadox\EntityState\Internal\ObjectExtractor;
 use Stratadox\EntityState\Internal\PropertyExtractor;
 use Stratadox\EntityState\Internal\ScalarExtractor;
 use Stratadox\EntityState\Internal\ShouldStringify;
+use Stratadox\EntityState\Internal\Stringifier;
 use Stratadox\IdentityMap\MapsObjectsByIdentity as Map;
 use Stratadox\IdentityMap\NoSuchObject;
 
@@ -37,9 +39,15 @@ final class Extract implements ExtractsEntityState
     public static function state(): ExtractsEntityState
     {
         return new Extract(
-            PropertyExtractor::using(CollectionExtractor::withAlternative(
-                ObjectExtractor::withAlternative(ScalarExtractor::asLastResort())
-            ))
+            PropertyExtractor::using(
+                CollectionExtractor::withAlternative(
+                    EntityReferenceExtractor::withAlternative(
+                        ObjectExtractor::withAlternative(
+                            ScalarExtractor::asLastResort()
+                        )
+                    )
+                )
+            )
         );
     }
 
@@ -52,12 +60,18 @@ final class Extract implements ExtractsEntityState
     public static function stringifying(...$classes): ExtractsEntityState
     {
         return new Extract(
-            PropertyExtractor::using(CollectionExtractor::withAlternative(
-                ObjectExtractor::stringifyingWithAlternative(
-                    ShouldStringify::these(...$classes),
-                    ScalarExtractor::asLastResort()
+            PropertyExtractor::using(
+                CollectionExtractor::withAlternative(
+                    Stringifier::withCondition(
+                        ShouldStringify::these(...$classes),
+                        EntityReferenceExtractor::withAlternative(
+                            ObjectExtractor::withAlternative(
+                                ScalarExtractor::asLastResort()
+                            )
+                        )
+                    )
                 )
-            ))
+            )
         );
     }
 

@@ -47,13 +47,15 @@ use Stratadox\IdentityMap\IdentityMap;
  * @covers \Stratadox\EntityState\Internal\ReflectionProperties
  * @covers \Stratadox\EntityState\Internal\ReflectionProperty
  * @covers \Stratadox\EntityState\Internal\ShouldStringify
- * @covers \Stratadox\EntityState\Internal\Unsatisfiable
  * @covers \Stratadox\EntityState\Internal\Visited
  * @covers \Stratadox\EntityState\Internal\CollectionExtractor
  * @covers \Stratadox\EntityState\Internal\ObjectExtractor
  * @covers \Stratadox\EntityState\Internal\PropertyExtractor
  * @covers \Stratadox\EntityState\Internal\ScalarExtractor
  * @covers \Stratadox\EntityState\Internal\ExtractionRequest
+ * @covers \Stratadox\EntityState\Internal\Stringifier
+ * @covers \Stratadox\EntityState\Internal\EntityReferenceExtractor
+ * @todo Split into several test classes
  */
 class Extract_the_state_of_the_entities extends TestCase
 {
