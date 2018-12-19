@@ -39,6 +39,7 @@ use Stratadox\EntityState\Test\Fixture\RentalCar\Branding;
 use Stratadox\EntityState\Test\Fixture\RentalCar\Make;
 use Stratadox\EntityState\Test\Fixture\RentalCar\Model;
 use Stratadox\EntityState\Test\Fixture\RentalCar\Space;
+use Stratadox\EntityState\Test\Support\PropertyAsserting;
 use Stratadox\IdentityMap\IdentityMap;
 
 /**
@@ -59,6 +60,8 @@ use Stratadox\IdentityMap\IdentityMap;
  */
 class Extract_the_state_of_the_entities extends TestCase
 {
+    use PropertyAsserting;
+
     /** @test */
     function extracting_the_state_of_nested_entities()
     {
@@ -466,38 +469,5 @@ class Extract_the_state_of_the_entities extends TestCase
         $state = Extract::state()->from($map);
 
         $this->assertSame($map, $state->identityMap());
-    }
-
-    private function assertProperty(
-        RepresentsEntity $entity,
-        string $expectedName,
-        $expectedValue,
-        string $extraMessage = ''
-    ): void {
-        $names = [];
-        foreach ($entity->properties() as $property) {
-            if ($property->name() === $expectedName) {
-                $this->assertSame($expectedValue, $property->value(), sprintf(
-                    'Failed to assert the value of %s `%s` property `%s`. %s',
-                    $entity->class(),
-                    $entity->id(),
-                    $expectedName,
-                    $extraMessage
-                ));
-                return;
-            }
-            $names[] = $property->name();
-        }
-        $this->fail(sprintf(
-            'Failed to assert that the %s `%s` has a registered property `%s`. ' .
-            'Found: %s%s%s%s',
-            $entity->class(),
-            $entity->id(),
-            $expectedName,
-            PHP_EOL,
-            implode(PHP_EOL, $names),
-            PHP_EOL,
-            $extraMessage
-        ));
     }
 }
