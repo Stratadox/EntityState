@@ -66,9 +66,12 @@ final class ExtractionRequest
 
     public function pointsToAnotherEntity(): bool
     {
-        return is_object($this->value)
-            && $this->map->hasThe($this->value)
-            && !$this->isTheOwner();
+        return $this->pointsToAKnownEntity() && !$this->isTheOwner();
+    }
+
+    public function pointsToAKnownEntity(): bool
+    {
+        return is_object($this->value) && $this->map->hasThe($this->value);
     }
 
     /** @throws NoSuchObject */

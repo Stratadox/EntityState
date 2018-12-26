@@ -28,6 +28,9 @@ final class PropertyExtractor implements Extractor
                 [$request->visitedName()]
             )];
         }
-        return $this->next->extract($request->withVisitation(), $this);
+        return $this->next->extract(
+            $request->withVisitation(),
+            $baseExtractor ?: $this
+        );
     }
 }

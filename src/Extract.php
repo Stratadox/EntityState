@@ -3,12 +3,16 @@ declare(strict_types=1);
 
 namespace Stratadox\EntityState;
 
-use function array_map as extractWith;
+use function array_key_exists as alreadyAdded;
+use function array_shift;
+use function count;
 use function get_class as classOfThe;
+use Stratadox\EntityState\Internal\AcceptsNewEntities;
 use Stratadox\EntityState\Internal\CollectionExtractor;
 use Stratadox\EntityState\Internal\EntityReferenceExtractor;
 use Stratadox\EntityState\Internal\ExtractionRequest;
 use Stratadox\EntityState\Internal\Extractor;
+use Stratadox\EntityState\Internal\NewEntityDetector;
 use Stratadox\EntityState\Internal\ObjectExtractor;
 use Stratadox\EntityState\Internal\PropertyExtractor;
 use Stratadox\EntityState\Internal\ScalarExtractor;
@@ -22,9 +26,10 @@ use Stratadox\IdentityMap\NoSuchObject;
  *
  * @author Stratadox
  */
-final class Extract implements ExtractsEntityState
+final class Extract implements ExtractsEntityState, AcceptsNewEntities
 {
     private $extractor;
+    private $newEntities = [];
 
     private function __construct(Extractor $extractor)
     {
@@ -76,6 +81,15 @@ final class Extract implements ExtractsEntityState
     }
 
     /** @inheritdoc */
+    public function consideringIt(
+        DefinesEntityType ...$asEntities
+    ): ExtractsEntityState {
+        $new = clone $this;
+        $new->extractor = NewEntityDetector::with($new, $this->extractor, ...$asEntities);
+        return $new;
+    }
+
+    /** @inheritdoc */
     public function from(Map $map): State
     {
         return $this->fromOnly($map, ...$map->objects());
@@ -84,25 +98,41 @@ final class Extract implements ExtractsEntityState
     /** @inheritdoc */
     public function fromOnly(Map $map, object ...$objects): State
     {
-        return StateRepresentation::with(
-            EntityStates::list(...extractWith(
-                function (object $entity) use ($map): RepresentsEntity {
-                    return $this->stateOfThe($entity, $map);
-                }, $objects
-            )),
-            $map
-        );
+        $states = [];
+        foreach ($objects as $object) {
+            $states[] = $this->stateOfThe($object, $map, $map->idOf($object));
+        }
+        while (count($this->newEntities)) {
+            $newEntity = array_shift($this->newEntities);
+            [$object, $id] = $newEntity;
+            $map = $map->add($id, $object);
+            $states[] = $this->stateOfThe($object, $map, $id);
+        }
+        return StateRepresentation::with(EntityStates::list(...$states), $map);
+    }
+
+    /**
+     * @inheritdoc
+     * @internal
+     */
+    public function addAsNewEntity(object $newEntity, string $id): void
+    {
+        $identifier = classOfThe($newEntity) . '~' . $id;
+        if (!alreadyAdded($identifier, $this->newEntities)) {
+            $this->newEntities[$identifier] = [$newEntity, $id];
+        }
     }
 
     /** @throws NoSuchObject */
-    private function stateOfThe(object $entity, Map $map): RepresentsEntity
-    {
-        return EntityState::ofThe(
-            classOfThe($entity),
-            $map->idOf($entity),
-            PropertyStates::list(...$this->extractor->extract(
+    private function stateOfThe(
+        object $entity,
+        Map $map,
+        string $id
+    ): RepresentsEntity {
+        return EntityState::ofThe(classOfThe($entity), $id, PropertyStates::list(
+            ...$this->extractor->extract(
                 ExtractionRequest::for($entity, $map)
-            ))
-        );
+            )
+        ));
     }
 }

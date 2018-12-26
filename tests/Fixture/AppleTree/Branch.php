@@ -3,22 +3,18 @@ declare(strict_types=1);
 
 namespace Stratadox\EntityState\Test\Fixture\AppleTree;
 
-use Stratadox\ImmutableCollection\ImmutableCollection;
+use function count;
+use SplFixedArray;
 
-class Branch extends ImmutableCollection
+class Branch extends SplFixedArray
 {
-    public function __construct(Ripeness ...$ripenessOfTheApples)
+    public static function withApplesOf(Ripeness ...$ripenessOfTheApples): self
     {
-        $apples = [];
-        foreach ($ripenessOfTheApples as $ripeness) {
-            $apples[] = Apple::onBranch($this, $ripeness);
+        $branch = new static(count($ripenessOfTheApples));
+        foreach ($ripenessOfTheApples as $i => $ripeness) {
+            $branch[$i] = Apple::onBranch($branch, $ripeness);
         }
-        parent::__construct(...$apples);
-    }
-
-    public static function withApplesOf(Ripeness ...$apples): self
-    {
-        return new static(...$apples);
+        return $branch;
     }
 
     public function current(): Apple
@@ -28,24 +24,24 @@ class Branch extends ImmutableCollection
 
     public function growNewApple(): self
     {
-        $ripeness = [];
-        foreach ($this as $apple) {
-            $ripeness[] = $apple->ripeness();
+        $branch = new static($this->count() + 1);
+        foreach ($this as $i => $apple) {
+            $branch[$i] = $apple;
         }
-        $ripeness[] = Ripeness::scored(0);
-        return new static(...$ripeness);
+        $branch[$this->count()] = Apple::onBranch($branch, Ripeness::scored(0));
+        return $branch;
     }
 
     public function increaseRipeness(AppleFallObserver $fallObserver): self
     {
-        $remainingApples = [];
+        $ripeness = [];
         foreach ($this as $apple) {
             if ($apple->isReadyToFall()) {
                 $fallObserver->itFalls(Apple::onTheGround());
             } else {
-                $remainingApples[] = $apple->increaseRipeness();
+                $ripeness[] = $apple->increaseRipeness();
             }
         }
-        return new static(...$remainingApples);
+        return static::withApplesOf(...$ripeness);
     }
 }
