@@ -14,6 +14,7 @@ use Stratadox\IdentityMap\IdentityMap;
 
 /**
  * @covers \Stratadox\EntityState\Extract
+ * @covers \Stratadox\EntityState\Internal\ExtractionRequest
  * @covers \Stratadox\EntityState\Internal\NewEntityDetector
  */
 class Extract_new_related_entities extends TestCase
