@@ -3,7 +3,6 @@
 namespace Stratadox\EntityState\Test\Unit;
 
 use PHPUnit\Framework\TestCase;
-use function spl_object_id;
 use Stratadox\EntityState\AnEntity;
 use Stratadox\EntityState\Test\Fixture\Guests\Guest;
 
@@ -42,15 +41,12 @@ class AnEntity_definition_recognises_entities extends TestCase
     }
 
     /** @test */
-    function returning_a_temporary_id_when_not_knowing_what_to_extract()
+    function returning_null_if_the_id_is_generated_later()
     {
         $definition = AnEntity::whenEncountering(Guest::class);
         $guest = Guest::withIp('127.0.0.1');
 
-        $this->assertSame(
-            '#new-entity:' . spl_object_id($guest),
-            $definition->idFor($guest)
-        );
+        $this->assertNull($definition->idFor($guest));
     }
 
     public function ipAddresses(): iterable

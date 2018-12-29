@@ -51,10 +51,10 @@ final class AnEntity implements DefinesEntityType
     }
 
     /** @inheritdoc */
-    public function idFor(object $recognisedEntity): string
+    public function idFor(object $recognisedEntity): ?string
     {
         if (null === $this->identifierProperty) {
-            return '#new-entity:' . spl_object_id($recognisedEntity);
+            return null;
         }
         return $this->identifierProperty->getValue($recognisedEntity);
     }

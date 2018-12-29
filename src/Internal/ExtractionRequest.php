@@ -2,6 +2,7 @@
 
 namespace Stratadox\EntityState\Internal;
 
+use function in_array;
 use function is_object;
 use Stratadox\IdentityMap\MapsObjectsByIdentity as Map;
 use Stratadox\IdentityMap\NoSuchObject;
@@ -13,29 +14,33 @@ final class ExtractionRequest
     private $name;
     private $map;
     private $visited;
+    private $newEntities;
 
     private function __construct(
         $value,
         object $owner,
         Name $name,
         Map $map,
-        Visited $visited
+        Visited $visited,
+        object ...$newEntities
     ) {
         $this->value = $value;
         $this->owner = $owner;
         $this->name = $name;
         $this->map = $map;
         $this->visited = $visited;
+        $this->newEntities = $newEntities;
     }
 
-    public static function for($entity, Map $identityMap): self
+    public static function for($entity, Map $identityMap, object ...$newEntities): self
     {
         return new self(
             $entity,
             $entity,
             Name::start(),
             $identityMap,
-            Visited::noneYet()
+            Visited::noneYet(),
+            ...$newEntities
         );
     }
 
@@ -71,7 +76,10 @@ final class ExtractionRequest
 
     public function pointsToAKnownEntity(): bool
     {
-        return is_object($this->value) && $this->map->hasThe($this->value);
+        return is_object($this->value) && (
+            $this->map->hasThe($this->value) ||
+            in_array($this->value, $this->newEntities, true)
+        );
     }
 
     /** @throws NoSuchObject */
@@ -92,13 +100,9 @@ final class ExtractionRequest
 
     public function withVisitation(): self
     {
-        return new self(
-            $this->value,
-            $this->owner,
-            $this->name,
-            $this->map,
-            $this->visited->add($this->value, $this->name)
-        );
+        $new = clone $this;
+        $new->visited = $this->visited->add($this->value, $this->name);
+        return $new;
     }
 
     public function forCollectionItem(
@@ -106,27 +110,19 @@ final class ExtractionRequest
         string $key,
         $value
     ): self {
-        return new self(
-            $value,
-            $this->owner,
-            $this->name->forItem($collection, $key),
-            $this->map,
-            $this->visited
-        );
+        $new = clone $this;
+        $new->value = $value;
+        $new->name = $this->name->forItem($collection, $key);
+        return $new;
     }
 
     public function forProperty(ReflectionProperty $property): self
     {
-        $name = $this->isTheOwner() ?
-            $this->name :
-            $this->name->for($this->value);
-
-        return new self(
-            $property->getValue($this->value),
-            $this->owner,
-            $name->forReflected($property),
-            $this->map,
-            $this->visited
-        );
+        $new = clone $this;
+        $new->value = $property->getValue($this->value);
+        $new->name = $this->isTheOwner() ?
+            $this->name->forReflected($property) :
+            $this->name->for($this->value)->forReflected($property);
+        return $new;
     }
 }

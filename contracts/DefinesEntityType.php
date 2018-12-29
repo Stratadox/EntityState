@@ -24,7 +24,7 @@ interface DefinesEntityType
      * to the data store.
      *
      * @param object $recognisedEntity The object for which to find the id.
-     * @return string                  The id as string or null when none found.
+     * @return null|string             The id, or null if it's assigned later.
      */
-    public function idFor(object $recognisedEntity): string;
+    public function idFor(object $recognisedEntity): ?string;
 }

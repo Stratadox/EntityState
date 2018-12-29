@@ -18,7 +18,7 @@ final class EntityState implements RepresentsEntity
 
     private function __construct(
         string $class,
-        string $id,
+        ?string $id,
         ListsPropertyStates $properties
     ) {
         $this->class = $class;
@@ -30,13 +30,13 @@ final class EntityState implements RepresentsEntity
      * Produces an entity representation.
      *
      * @param string              $class      The fully qualified class name.
-     * @param string              $id         The id of the entity.
+     * @param null|string         $id         The id of the entity.
      * @param ListsPropertyStates $properties The property state representations.
      * @return RepresentsEntity               The entity state representation.
      */
     public static function ofThe(
         string $class,
-        string $id,
+        ?string $id,
         ListsPropertyStates $properties
     ): RepresentsEntity {
         return new self($class, $id, $properties);
@@ -56,7 +56,7 @@ final class EntityState implements RepresentsEntity
     }
 
     /** @inheritdoc */
-    public function id(): string
+    public function id(): ?string
     {
         return $this->id;
     }

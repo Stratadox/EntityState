@@ -83,7 +83,6 @@ class Growing_an_apple extends TestCase
 
         $newState = $extract->from($map);
         $changes = $newState->changesSince($initialState);
-        $newMap = $newState->identityMap();
 
         $this->assertCount(1, $changes->added());
         $appleRepresentation = $changes->added()[0];
@@ -92,15 +91,6 @@ class Growing_an_apple extends TestCase
             $appleRepresentation,
             Ripeness::class . ':ripeness.score',
             0
-        );
-
-        $this->assertFalse(
-            $map->hasThe($tree->branches()[1][2]),
-            'The new branch is not expected to be in the old identity map.'
-        );
-        $this->assertTrue(
-            $newMap->hasThe($tree->branches()[1][2]),
-            'The new branch is added to the updated identity map.'
         );
     }
 }

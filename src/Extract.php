@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Stratadox\EntityState;
 
-use function array_key_exists as alreadyAdded;
 use function array_shift;
 use function count;
 use function get_class as classOfThe;
+use function in_array;
 use Stratadox\EntityState\Internal\AcceptsNewEntities;
 use Stratadox\EntityState\Internal\CollectionExtractor;
 use Stratadox\EntityState\Internal\EntityReferenceExtractor;
@@ -29,6 +29,7 @@ use Stratadox\IdentityMap\NoSuchObject;
 final class Extract implements ExtractsEntityState, AcceptsNewEntities
 {
     private $extractor;
+    private $newEntityQueue = [];
     private $newEntities = [];
 
     private function __construct(Extractor $extractor)
@@ -102,11 +103,10 @@ final class Extract implements ExtractsEntityState, AcceptsNewEntities
         foreach ($objects as $object) {
             $states[] = $this->stateOfThe($object, $map, $map->idOf($object));
         }
-        while (count($this->newEntities)) {
-            $newEntity = array_shift($this->newEntities);
+        while (count($this->newEntityQueue)) {
+            $newEntity = array_shift($this->newEntityQueue);
             [$object, $id] = $newEntity;
-            $map = $map->add($id, $object);
-            $states[] = $this->stateOfThe($object, $map, $id);
+            $states[] = $this->stateOfThe($object, $map, $id, $this->newEntities);
         }
         return StateRepresentation::with(EntityStates::list(...$states), $map);
     }
@@ -115,11 +115,11 @@ final class Extract implements ExtractsEntityState, AcceptsNewEntities
      * @inheritdoc
      * @internal
      */
-    public function addAsNewEntity(object $newEntity, string $id): void
+    public function addAsNewEntity(object $newEntity, ?string $id): void
     {
-        $identifier = classOfThe($newEntity) . '~' . $id;
-        if (!alreadyAdded($identifier, $this->newEntities)) {
-            $this->newEntities[$identifier] = [$newEntity, $id];
+        if (!in_array($newEntity, $this->newEntities, true)) {
+            $this->newEntityQueue[] = [$newEntity, $id];
+            $this->newEntities[] = $newEntity;
         }
     }
 
@@ -127,11 +127,12 @@ final class Extract implements ExtractsEntityState, AcceptsNewEntities
     private function stateOfThe(
         object $entity,
         Map $map,
-        string $id
+        ?string $id,
+        array $newEntities = []
     ): RepresentsEntity {
         return EntityState::ofThe(classOfThe($entity), $id, PropertyStates::list(
             ...$this->extractor->extract(
-                ExtractionRequest::for($entity, $map)
+                ExtractionRequest::for($entity, $map, ...$newEntities)
             )
         ));
     }

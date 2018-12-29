@@ -21,9 +21,9 @@ interface RepresentsEntity
     /**
      * Retrieves the identifier of the entity.
      *
-     * @return string The identifier.
+     * @return null|string The identifier, or null if none has been assigned yet.
      */
-    public function id(): string;
+    public function id(): ?string;
 
     /**
      * Checks whether the entity has the same class and id as the other entity.

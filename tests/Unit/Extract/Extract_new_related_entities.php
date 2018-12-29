@@ -2,7 +2,6 @@
 
 namespace Stratadox\EntityState\Test\Unit\Extract;
 use PHPUnit\Framework\TestCase;
-use function spl_object_id;
 use Stratadox\EntityState\AnEntity;
 use Stratadox\EntityState\Extract;
 use Stratadox\EntityState\Test\Fixture\Guests\Guest;
@@ -35,10 +34,7 @@ class Extract_new_related_entities extends TestCase
 
         $this->assertSame('stratadox.com', $entityStates[0]->id());
         $this->assertSame('127.0.0.1', $entityStates[1]->id());
-        $this->assertSame(
-            '#new-entity:' . spl_object_id($referrer->referrals()[1]),
-            $entityStates[2]->id()
-        );
+        $this->assertNull($entityStates[2]->id());
     }
 
     /** @test */
@@ -63,7 +59,7 @@ class Extract_new_related_entities extends TestCase
     }
 
     /** @test */
-    function adding_the_new_entity_to_the_identity_map()
+    function not_adding_the_new_entity_to_the_identity_map()
     {
         $referrer = Referrer::fromFirstReferral('stratadox.com', '127.0.0.1');
         $map = IdentityMap::with([
@@ -78,7 +74,7 @@ class Extract_new_related_entities extends TestCase
             ->from($map);
 
         $map = $entityStates->identityMap();
-        $this->assertTrue($map->hasThe($referrer->referrals()[1]));
+        $this->assertFalse($map->hasThe($referrer->referrals()[1]));
     }
 
     /** @test */
