@@ -2,6 +2,7 @@
 
 namespace Stratadox\EntityState;
 
+use function is_string;
 use Stratadox\IdentityMap\MapsObjectsByIdentity;
 
 final class StateRepresentation implements State
@@ -40,12 +41,14 @@ final class StateRepresentation implements State
         $map = $this->map;
         foreach ($additional->entityStates() as $entityState) {
             $entityStates = $entityStates->add($entityState);
-            $map = $this->addToMapIfNew(
-                $map,
-                $additional->identityMap(),
-                $entityState->class(),
-                $entityState->id()
-            );
+            if (is_string($entityState->id())) {
+                $map = $this->addToMapIfNew(
+                    $map,
+                    $additional->identityMap(),
+                    $entityState->class(),
+                    $entityState->id()
+                );
+            }
         }
         return new self($entityStates, $map);
     }

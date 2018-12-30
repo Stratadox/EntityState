@@ -5,9 +5,12 @@ namespace Stratadox\EntityState\Test\Unit;
 use BadMethodCallException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Stratadox\EntityState\EntityState;
 use Stratadox\EntityState\EntityStates;
 use Stratadox\EntityState\Extract;
+use Stratadox\EntityState\InvalidStateAddition;
 use Stratadox\EntityState\ListsEntityStates;
+use Stratadox\EntityState\PropertyStates;
 use Stratadox\EntityState\RepresentsEntity;
 use Stratadox\EntityState\StateRepresentation;
 use Stratadox\EntityState\Test\Fixture\Coin\Copper;
@@ -148,6 +151,23 @@ class StateRepresentation_contains_entities_and_a_map extends TestCase
         $this->assertTrue($combinedState->identityMap()->hasThe($originalCoin));
         $this->assertTrue($combinedState->identityMap()->hasThe($extraCoin));
         $this->assertFalse($combinedState->identityMap()->hasThe($ignoredCoin));
+    }
+
+    /** @test */
+    function adding_state_with_entities_that_do_not_have_an_id()
+    {
+        $map = IdentityMap::startEmpty();
+        $state = StateRepresentation::with(EntityStates::list(), $map);
+        $stateWithNomenNescioEntity = StateRepresentation::with(
+            EntityStates::list(
+                EntityState::ofThe(Copper::class, null, PropertyStates::list())
+            ),
+            $map
+        );
+
+        $combinedState = $state->add($stateWithNomenNescioEntity);
+
+        $this->assertSame($map, $combinedState->identityMap());
     }
 
     /** @test */
